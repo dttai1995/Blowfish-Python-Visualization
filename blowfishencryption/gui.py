@@ -3,6 +3,8 @@ from tkinter import Entry, END, Button, Tk, Label, messagebox, Toplevel, mainloo
 from blowfish import BlowfishCipher
 from const import DEFAULT_ENCODING
 
+HEXA = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "A", "B", "C", "D", "E", "F"]
+
 
 class Window:
     def __init__(self):
@@ -66,15 +68,14 @@ class Window:
 
     def change(self):
         try:
-            key = self.e1.get()
-            plaintext = self.e2.get()
+            plaintext = self.e1.get()
+            key = self.e2.get()
             blowfish = BlowfishCipher(bytes(key, DEFAULT_ENCODING))
             self.s_box = [blowfish.S1, blowfish.S2
                 , blowfish.S3
                 , blowfish.S4]
             print(blowfish.S1)
-            self.change_entry_text(self.e3, blowfish.encrypt_block(bytes(plaintext, DEFAULT_ENCODING)).hex())
-            self.buttons["change"].config(state="disabled")
+            self.change_entry_text(self.e3, blowfish.encrypt_block(bytes(plaintext, DEFAULT_ENCODING)))
             self.buttons["1"].config(state="active")
             self.buttons["2"].config(state="active")
             self.buttons["3"].config(state="active")
@@ -86,7 +87,7 @@ class Window:
     def decrypt(self):
         try:
             cipher = self.cipherentry.get()
-            self.change_entry_text(self.e4, self.blowfish.decrypt_block(bytes(cipher, DEFAULT_ENCODING)).hex())
+            self.change_entry_text(self.e4, self.blowfish.decrypt_block(bytes(cipher, DEFAULT_ENCODING)))
             pass
         except:
             messagebox.showinfo("Blowfish not initialize yet")
@@ -95,13 +96,17 @@ class Window:
         box = Toplevel(self.root)
         box.wm_title("S" + str(idx + 1))
         data = self.s_box[idx]
-
+        for i in range(0,16):
+            l1 = Label(box, text = str(HEXA[i]))
+            l2 = Label(box, text = str(HEXA[i]))
+            l1.grid(row=0, column=i+1)
+            l2.grid(row=i+1, column=0)
         for i in range(0, 16):
             for j in range(0, 16):
                 print(str(data[i * 16 + j]))
                 b = Entry(box, font=("Calibri", 8), width=8, text=str(data[i * 16 + j]))
                 self.change_entry_text(b, '{0:08X}'.format(data[i * 16 + j]))
-                b.grid(row=i, column=j)
+                b.grid(row=i+1, column=j+1)
 
         print(len(data))
 
