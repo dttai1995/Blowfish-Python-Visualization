@@ -416,18 +416,6 @@ class BlowfishCipher(object):
         p_penultimate, p_last = P[-1]
         return R ^ p_last, L ^ p_penultimate
 
-    @staticmethod
-    def _decrypt(L, R, P, S1, S2, S3, S4, u4_1_pack, u1_4_unpack):
-        for p2, p1 in P[:0:-1]:
-            L ^= p1
-            a, b, c, d = u1_4_unpack(u4_1_pack(L))
-            R ^= (S1[a] + S2[b] ^ S3[c]) + S4[d] & 0xffffffff
-            R ^= p2
-            a, b, c, d = u1_4_unpack(u4_1_pack(R))
-            L ^= (S1[a] + S2[b] ^ S3[c]) + S4[d] & 0xffffffff
-        p_first, p_second = P[0]
-        return R ^ p_first, L ^ p_second
-
     def encrypt_block(self, block):
         """
         Return a :obj:`bytes` object containing the encrypted bytes of a `block`.
@@ -483,8 +471,3 @@ class BlowfishCipher(object):
             L ^= (S0[a] + S1[b] ^ S2[c]) + S3[d] & 0xffffffff
         p_first, p_second = P[0]
         return self._u4_2_pack(R ^ p_first, L ^ p_second)
-
-
-if __name__ == "__main__":
-    cipher = BlowfishCipher(b'12345')
-    print(cipher.encrypt_block(b'aaaaaaaa'))
